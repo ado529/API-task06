@@ -14,6 +14,8 @@
   <button id="btn">ダーツが刺さったのは・・・</button>
   <p>あなたの行先は↓です。</p>
   <div id="destination"></div>
+
+  <button id="btn2">さっそく宿泊先を探しましょう！</button>  
   <div id="output"></div>
 
 
@@ -1825,49 +1827,45 @@
 
     const randomNumber = Math.floor(Math.random() * jsonarray.length);
     const destination= jsonarray[randomNumber];
-
     console.log(destination);
 
-    console.log = function (log) {
-      document.getElementById('destination').innerHTML += log + "<br>";
-      }
-    });
+    $("#destination").html(`${destination.prefectureName}${destination.cityName}`);
 
-    
-    //$("#destination").html(destination);
+  });
 
-    
+  $('#btn2').on('click', function () {
+    const keyword = document.getElementById("destination");
+    console.log(keyword.innerHTML);
+    const encode = encodeURI(`${keyword.innerHTML}`);
+    console.log(encode);
 
-    
+   //リクエストを送るurlを準備
+   const url = `https://app.rakuten.co.jp/services/api/Travel/KeywordHotelSearch/20170426?applicationId=[]&format=json&keyword=${encode}`;
+ 
+   axios.get(url)
+    .then(function(response){
+      console.log(response.data.hotels);
+      console.log(response.data.hotels[0].hotel[0].hotelBasicInfo);
 
+      const array=[];
 
+      for(let i=0;i<response.data.hotels.length;i++){
+      array.push(`<p>${response.data.hotels[i].hotel[0].hotelBasicInfo.hotelName}</p>`);
+      array.push(`<a href= "${response.data.hotels[i].hotel[0].hotelBasicInfo.hotelInformationUrl}" target="_blank" >${ response.data.hotels[i].hotel[0].hotelBasicInfo.hotelName }</a><br>`);
+      array.push(`☆<p>${response.data.hotels[i].hotel[0].hotelBasicInfo.reviewAverage}</p>`);
+      array.push(`<img src=${response.data.hotels[i].hotel[0].hotelBasicInfo.hotelThumbnailUrl}>`);
+      array.push(`<p>${response.data.hotels[i].hotel[0].hotelBasicInfo.hotelSpecial}</p>`);
+    };
 
-    // リクエストを送るurlを準備
-    //const url = `https://app.rakuten.co.jp/services/api/Travel/KeywordHotelSearch/20170426?applicationId=&format=json&keyword=${encodekeyword}`;
+      $("#output").html(array);
+    })
+    .catch(function(error){
+      console.log(error);
+    })
+    .finally(function(){});
 
-    //axios.get(url)
-    //.then(function(response){
-    //  console.log(response.data.hotels);
-    //  console.log(response.data.hotels[0].hotel[0].hotelBasicInfo);
+   });
 
-    //  const array=[];
-
-    //  for(let i=0;i<response.data.hotels.length;i++){
-        //array.push(`<p>${response.data.hotels[i].hotel[0].hotelBasicInfo.hotelName}</p>`);
-    //    array.push(`<a href= "${response.data.hotels[i].hotel[0].hotelBasicInfo.hotelInformationUrl}" target="_blank" >${ response.data.hotels[i].hotel[0].hotelBasicInfo.hotelName }</a><br>`);
-    //    array.push(`☆<p>${response.data.hotels[i].hotel[0].hotelBasicInfo.reviewAverage}</p>`);
-    //    array.push(`<img src=${response.data.hotels[i].hotel[0].hotelBasicInfo.hotelThumbnailUrl}>`);
-    //    array.push(`<p>${response.data.hotels[i].hotel[0].hotelBasicInfo.hotelSpecial}</p>`);
-    //  };
-
-    //  $("#output").html(array);
-    //})
-    //.catch(function(error){
-    //  console.log(error);
-    //})
-    //.finally(function(){});
-
-  //});
 
 
   </script>
